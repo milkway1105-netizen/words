@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>어휘끝 고교기본 - 테스트</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Outfit:wght@700;800;900&family=DM+Mono:wght@400;500&display=swap');
+  :root {
+    --bg: #0f0f0f; --surface: #1a1a1a; --surface2: #242424;
+    --accent: #e8572a; --accent2: #2a6ee8;
+    --text: #f0ece4; --text-dim: #777; --border: #2e2e2e;
+    --correct: #22c55e; --wrong: #ef4444;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 20px 16px 80px; }
+  .header { max-width: 480px; margin: 0 auto 20px; display: flex; justify-content: space-between; align-items: center; }
+  .logo { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 900; color: var(--accent); }
+  .logo span { color: var(--text); }
+  .nav-btn { padding: 7px 16px; border-radius: 20px; border: 1.5px solid var(--border); background: transparent; font-family: 'Noto Sans KR', sans-serif; font-size: 12px; cursor: pointer; color: var(--text-dim); transition: all 0.2s; text-decoration: none; display: inline-block; }
+  .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+  #home-screen { max-width: 480px; margin: 0 auto; }
+  .home-title { font-family: 'Outfit', sans-serif; font-size: 28px; font-weight: 800; margin-bottom: 6px; }
+  .home-sub { color: var(--text-dim); font-size: 13px; margin-bottom: 8px; }
+  .student-row { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+  .student-row label { font-size: 13px; color: var(--text-dim); white-space: nowrap; }
+  .student-input { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-family: 'Noto Sans KR', sans-serif; font-size: 14px; color: var(--text); outline: none; }
+  .student-input:focus { border-color: var(--accent2); }
+  .section-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--text-dim); text-transform: uppercase; margin: 16px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+  .lesson-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 4px; }
+  .lesson-btn { aspect-ratio: 1; border-radius: 12px; border: 1.5px solid var(--border); background: var(--surface); font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; color: var(--text); transition: all 0.15s; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 2px; }
+  .lesson-btn:hover { border-color: var(--accent); background: rgba(232,87,42,0.08); }
+  .lesson-btn .lesson-num { font-size: 14px; font-weight: 800; }
+  .lesson-btn .lesson-count { font-size: 10px; font-weight: 400; font-family: 'Noto Sans KR', sans-serif; color: var(--text-dim); }
+  #quiz-screen { max-width: 480px; margin: 0 auto; display: none; }
+  .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .lesson-badge { background: var(--accent); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; font-family: 'Outfit', sans-serif; }
+  .progress-text { font-size: 12px; color: var(--text-dim); font-family: 'DM Mono', monospace; }
+  .progress-bar-wrap { background: var(--border); border-radius: 4px; height: 4px; margin-bottom: 20px; }
+  .progress-bar { height: 4px; border-radius: 4px; background: var(--accent); transition: width 0.3s; }
+  .question-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; text-align: center; }
+  .q-type { font-size: 11px; color: var(--text-dim); letter-spacing: 1px; margin-bottom: 8px; }
+  .q-word { font-family: 'Outfit', sans-serif; font-size: 36px; font-weight: 800; }
+  .q-hint { font-size: 12px; color: var(--text-dim); margin-top: 8px; }
+  .answer-input { width: 100%; background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 12px; font-family: 'Noto Sans KR', sans-serif; font-size: 18px; color: var(--text); outline: none; text-align: center; transition: border-color 0.2s; }
+  .answer-input:focus { border-color: var(--accent2); }
+  .answer-input.correct { border-color: var(--correct); color: var(--correct); }
+  .answer-input.wrong { border-color: var(--wrong); color: var(--wrong); }
+  .submit-btn { width: 100%; padding: 15px; border-radius: 14px; background: var(--accent); color: white; border: none; font-family: 'Noto Sans KR', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+  .submit-btn:hover { opacity: 0.9; }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .feedback-box { background: var(--surface); border-radius: 14px; padding: 16px; margin-top: 12px; display: none; text-align: center; }
+  .feedback-box.show { display: block; }
+  .feedback-correct { color: var(--correct); font-weight: 700; font-size: 16px; }
+  .feedback-wrong { color: var(--wrong); font-weight: 700; font-size: 16px; }
+  .feedback-answer { font-size: 14px; color: var(--text-dim); margin-top: 6px; }
+  .next-btn { width: 100%; padding: 13px; border-radius: 12px; background: var(--surface2); border: 1px solid var(--border); font-family: 'Noto Sans KR', sans-serif; font-size: 14px; color: var(--text-dim); cursor: pointer; margin-top: 10px; transition: all 0.15s; }
+  .next-btn:hover { border-color: var(--text-dim); color: var(--text); }
+  #result-screen { max-width: 480px; margin: 0 auto; display: none; text-align: center; padding-top: 30px; }
+  .result-emoji { font-size: 60px; margin-bottom: 16px; }
+  .result-title { font-family: 'Outfit', sans-serif; font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+  .result-sub { color: var(--text-dim); font-size: 14px; margin-bottom: 24px; }
+  .score-box { background: var(--surface); border: 1.5px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 20px; }
+  .score-num { font-family: 'Outfit', sans-serif; font-size: 56px; font-weight: 900; color: var(--accent); }
+  .score-label { font-size: 14px; color: var(--text-dim); }
+  .wrong-list { text-align: left; margin-bottom: 20px; }
+  .wrong-title { font-size: 13px; font-weight: 700; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+  .wrong-item { background: var(--surface); border: 1px solid rgba(239,68,68,0.2); border-radius: 10px; padding: 10px 14px; margin-bottom: 6px; display: flex; justify-content: space-between; }
+  .wrong-item .en { font-family: 'DM Mono', monospace; color: var(--wrong); font-size: 14px; }
+  .wrong-item .ko { font-size: 13px; color: var(--text-dim); }
+  .btn-retry { width: 100%; padding: 15px; border-radius: 14px; background: var(--accent); color: white; border: none; font-family: 'Noto Sans KR', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; margin-bottom: 10px; }
+  .btn-home2 { width: 100%; padding: 13px; border-radius: 14px; background: transparent; border: 1px solid var(--border); font-family: 'Noto Sans KR', sans-serif; font-size: 14px; color: var(--text-dim); cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">어휘끝<span> 테스트</span></div>
+  <button class="nav-btn" onclick="location.href='vocab_study_1_44.html'" style="cursor:pointer;">← 학습</button>
+</div>
+
+<div id="home-screen">
+  <div class="home-title">단어 테스트</div>
+  <div class="home-sub">영어 단어를 보고 한국어 뜻을 써보세요</div>
+  <div class="student-row">
+    <label>이름</label>
+    <input class="student-input" id="student-name" type="text" placeholder="이름을 입력하세요" />
+  </div>
+  <div class="section-label">1~10강</div>
+  <div class="lesson-grid" id="grid-1-10"></div>
+  <div class="section-label">11~20강</div>
+  <div class="lesson-grid" id="grid-11-20"></div>
+  <div class="section-label">21~30강</div>
+  <div class="lesson-grid" id="grid-21-30"></div>
+  <div class="section-label">31~44강</div>
+  <div class="lesson-grid" id="grid-31-44"></div>
+</div>
+
+<div id="quiz-screen">
+  <div class="quiz-header">
+    <button class="nav-btn" onclick="goHome()" style="padding:5px 12px;font-size:11px;">← 목록</button>
+    <span class="lesson-badge" id="quiz-badge">1강</span>
+    <span class="progress-text" id="quiz-progress">1 / 20</span>
+  </div>
+  <div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+  <div class="question-box">
+    <div class="q-type">한국어 뜻을 쓰세요</div>
+    <div class="q-word" id="q-word">word</div>
+    <div class="q-hint" id="q-hint"></div>
+  </div>
+  <input class="answer-input" id="answer-input" type="text" placeholder="뜻을 입력하세요" autocomplete="off" />
+  <button class="submit-btn" id="submit-btn" onclick="submitAnswer()">제출</button>
+  <div class="feedback-box" id="feedback-box">
+    <div id="feedback-text"></div>
+    <div class="feedback-answer" id="feedback-answer"></div>
+    <button class="next-btn" onclick="nextQuestion()">다음 →</button>
+  </div>
+</div>
+
+<div id="result-screen">
+  <div class="result-emoji" id="result-emoji">🎉</div>
+  <div class="result-title" id="result-title">완료!</div>
+  <div class="result-sub" id="result-sub"></div>
+  <div class="score-box">
+    <div class="score-num" id="score-num">0%</div>
+    <div class="score-label" id="score-label"></div>
+  </div>
+  <div class="wrong-list" id="wrong-list"></div>
+  <button class="btn-retry" onclick="retryWrong()">오답만 다시 풀기</button>
+  <button class="btn-home2" onclick="goHome()">강 선택으로</button>
+</div>
+
+<script>
+const WORDS = {
+  1:[{en:"compare",ko:"비교하다"},{en:"divide",ko:"나누다"},{en:"leave",ko:"떠나다, 남기다"},{en:"follow",ko:"따라가다, 따르다"},{en:"control",ko:"통제하다"},{en:"conclude",ko:"결론 짓다"},{en:"occur",ko:"일어나다, 발생하다"},{en:"notice",ko:"알아차리다"},{en:"fit",ko:"맞다, 적합하다"},{en:"suggest",ko:"제안하다"},{en:"relate",ko:"관련짓다"},{en:"concentrate",ko:"집중하다"},{en:"develop",ko:"발전시키다, 개발하다"},{en:"prevent",ko:"막다, 예방하다"},{en:"motivate",ko:"동기부여 하다"},{en:"belong",ko:"속하다"},{en:"recognize",ko:"인식하다, 알아보다"},{en:"remind",ko:"상기시키다"},{en:"confuse",ko:"혼란스럽게 하다"},{en:"involve",ko:"포함하다, 관여하다"},{en:"claim",ko:"주장하다"},{en:"demand",ko:"요구하다"},{en:"tend",ko:"경향이 있다"},{en:"recommend",ko:"추천하다"},{en:"respond",ko:"대답하다, 반응하다"}],
+  2:[{en:"behave",ko:"행동하다"},{en:"approach",ko:"접근하다, 다가가다"},{en:"transfer",ko:"이동하다, 전달하다"},{en:"sink",ko:"가라앉다"},{en:"swing",ko:"흔들다, 흔들리다"},{en:"crawl",ko:"기어가다"},{en:"bounce",ko:"튀다"},{en:"explode",ko:"폭발하다"},{en:"slip",ko:"미끄러지다"},{en:"drag",ko:"끌다"},{en:"bend",ko:"구부리다"},{en:"attach",ko:"붙이다"},{en:"lay",ko:"놓다, 눕히다"},{en:"capture",ko:"포착하다, 잡다"},{en:"pack",ko:"싸다, 포장하다"},{en:"wrap",ko:"싸다, 감싸다"},{en:"fold",ko:"접다"},{en:"twist",ko:"비틀다"},{en:"spill",ko:"쏟다, 엎지르다"},{en:"peel",ko:"껍질을 벗기다"},{en:"blend",ko:"섞다, 혼합하다"},{en:"dye",ko:"염색하다"},{en:"toss",ko:"던지다"},{en:"bury",ko:"묻다"},{en:"trap",ko:"가두다, 덫으로 잡다"},{en:"convey",ko:"전달하다"},{en:"load",ko:"싣다, 적재하다"},{en:"scratch",ko:"긁다"},{en:"shout",ko:"소리치다"},{en:"slam",ko:"쾅 닫다"},{en:"refund",ko:"환불하다"},{en:"install",ko:"설치하다"}],
+  3:[{en:"surround",ko:"둘러싸다"},{en:"resemble",ko:"닮다"},{en:"consist",ko:"구성되다"},{en:"decline",ko:"감소하다, 거절하다"},{en:"shorten",ko:"짧게 하다, 단축하다"},{en:"complicate",ko:"복잡하게 만들다"},{en:"debate",ko:"토론하다"},{en:"handle",ko:"다루다, 처리하다"},{en:"shift",ko:"이동하다, 바꾸다"},{en:"guarantee",ko:"보장하다"},{en:"resist",ko:"저항하다"},{en:"recover",ko:"회복하다"},{en:"deserve",ko:"받을 자격이 있다"},{en:"bet",ko:"내기하다"},{en:"restore",ko:"복구하다"},{en:"monitor",ko:"감시하다, 모니터링하다"},{en:"occupy",ko:"차지하다"},{en:"ruin",ko:"망치다, 파괴하다"},{en:"cheat",ko:"속이다"},{en:"calculate",ko:"계산하다"},{en:"estimate",ko:"추산하다, 평가하다"},{en:"evaluate",ko:"평가하다"},{en:"interact",ko:"상호 작용하다"},{en:"emphasize",ko:"강조하다"},{en:"confirm",ko:"확인하다"},{en:"satisfy",ko:"만족시키다"},{en:"bother",ko:"신경 쓰다, 귀찮게 하다"},{en:"frighten",ko:"무섭게 하다"}],
+  4:[{en:"active",ko:"활발한, 활동적인"},{en:"wild",ko:"야생의"},{en:"sharp",ko:"날카로운"},{en:"firm",ko:"단단한, 확고한"},{en:"stable",ko:"안정적인"},{en:"grand",ko:"웅장한, 거대한"},{en:"enormous",ko:"거대한, 엄청난"},{en:"tense",ko:"긴장한"},{en:"maximum",ko:"최대의"},{en:"convenient",ko:"편리한"},{en:"mobile",ko:"이동 가능한"},{en:"urgent",ko:"긴급한"},{en:"neat",ko:"깔끔한"},{en:"blank",ko:"빈, 공백의"},{en:"awesome",ko:"훌륭한, 엄청난"},{en:"costly",ko:"비싼, 값비싼"},{en:"chilly",ko:"쌀쌀한"},{en:"compact",ko:"소형의, 압축된"},{en:"deadly",ko:"치명적인"},{en:"dumb",ko:"무심한, 말 못하는"},{en:"lively",ko:"활기찬"},{en:"energetic",ko:"활동적인"},{en:"vibrant",ko:"활발한"},{en:"desperate",ko:"간절히 원하는, 절박한"},{en:"dependent",ko:"의존하는"},{en:"cruel",ko:"잔인한"},{en:"indifferent",ko:"무관심한"},{en:"tender",ko:"다정한"}],
+  5:[{en:"available",ko:"이용 가능한"},{en:"practical",ko:"실용적인"},{en:"previous",ko:"이전의"},{en:"former",ko:"이전의, 전임의"},{en:"exact",ko:"정확한"},{en:"single",ko:"단일의, 혼자의"},{en:"solo",ko:"혼자의, 단독의"},{en:"odd",ko:"이상한, 홀수의"},{en:"due",ko:"예정된, 마땅한"},{en:"likely",ko:"~할 것 같은"},{en:"capable",ko:"능력 있는"},{en:"eager",ko:"열망하는"},{en:"alike",ko:"비슷한, 같이"},{en:"absent",ko:"결석한, 없는"},{en:"fancy",ko:"고급의, 장식된"},{en:"personal",ko:"개인적인"},{en:"entire",ko:"전체의"},{en:"lifelong",ko:"평생의"},{en:"brief",ko:"짧은, 간단한"},{en:"frequent",ko:"빈번한"},{en:"initial",ko:"처음의"},{en:"broad",ko:"폭넓은"},{en:"consistent",ko:"한결같은, 일관된"},{en:"efficient",ko:"효율적인"},{en:"relevant",ko:"적합한, 관련 있는"},{en:"absolute",ko:"완전한, 절대적인"},{en:"opposite",ko:"반대의"},{en:"refreshed",ko:"기분 좋은, 상쾌한"},{en:"random",ko:"무작위의"}],
+  6:[{en:"community",ko:"공동체, 지역사회"},{en:"material",ko:"재료, 물질"},{en:"region",ko:"지역"},{en:"quality",ko:"품질, 질"},{en:"quantity",ko:"양, 수량"},{en:"edge",ko:"가장자리"},{en:"length",ko:"길이"},{en:"plenty",ko:"많음, 충분함"},{en:"accident",ko:"사고"},{en:"citizen",ko:"시민"},{en:"colleague",ko:"동료"},{en:"function",ko:"기능"},{en:"option",ko:"선택, 옵션"},{en:"instance",ko:"예, 사례"},{en:"route",ko:"길, 경로"},{en:"peak",ko:"정상, 최고점"},{en:"curve",ko:"곡선"},{en:"license",ko:"면허, 허가"},{en:"dozen",ko:"열두 개"},{en:"entry",ko:"입장, 항목"},{en:"fee",ko:"요금"},{en:"medicine",ko:"약"},{en:"poison",ko:"독"},{en:"dust",ko:"먼지"},{en:"tag",ko:"꼬리표"},{en:"creature",ko:"생물, 짐승"},{en:"sample",ko:"견본"},{en:"ash",ko:"재, 잿더미"},{en:"foam",ko:"거품"},{en:"element",ko:"요소"}],
+  7:[{en:"reason",ko:"이유, 이성"},{en:"reality",ko:"현실"},{en:"period",ko:"기간, 시기"},{en:"occasion",ko:"경우, 기회"},{en:"circumstance",ko:"상황, 환경"},{en:"structure",ko:"구조"},{en:"category",ko:"범주, 분류"},{en:"sort",ko:"종류, 분류하다"},{en:"market",ko:"시장"},{en:"industry",ko:"산업"},{en:"attitude",ko:"태도"},{en:"theory",ko:"이론"},{en:"factor",ko:"요인, 요소"},{en:"context",ko:"맥락, 상황"},{en:"labor",ko:"노동"},{en:"impact",ko:"영향, 충격"},{en:"favor",ko:"호의, 지지"},{en:"climate",ko:"기후"},{en:"symbol",ko:"상징"},{en:"freedom",ko:"자유"},{en:"vision",ko:"시력, 비전"},{en:"fault",ko:"잘못"},{en:"expense",ko:"비용"},{en:"boundary",ko:"경계"},{en:"pattern",ko:"양식, 패턴"},{en:"depth",ko:"깊이"},{en:"horror",ko:"공포"},{en:"curiosity",ko:"호기심"},{en:"intellect",ko:"지적 능력"},{en:"idol",ko:"우상"}],
+  8:[{en:"just",ko:"그냥, 단지, 딱"},{en:"rather",ko:"오히려, 꽤"},{en:"definitely",ko:"확실히"},{en:"indeed",ko:"정말로, 실제로"},{en:"overall",ko:"전반적으로"},{en:"simply",ko:"단순히, 간단히"},{en:"merely",ko:"단지, 그저"},{en:"extremely",ko:"극도로"},{en:"somewhat",ko:"다소, 약간"},{en:"altogether",ko:"완전히, 전부"},{en:"highly",ko:"매우, 높이"},{en:"increasingly",ko:"점점 더"},{en:"apparently",ko:"명백히, 겉으로 보기에"},{en:"basically",ko:"기본적으로"},{en:"necessarily",ko:"반드시"},{en:"roughly",ko:"대략, 거칠게"},{en:"fortunately",ko:"다행히"},{en:"luckily",ko:"운 좋게도"},{en:"frankly",ko:"솔직히"},{en:"meanwhile",ko:"그 동안에, 한편"},{en:"throughout",ko:"내내, 도처에"},{en:"nowadays",ko:"오늘날에는"},{en:"somehow",ko:"어떻게든"},{en:"aside",ko:"한쪽으로"},{en:"beneath",ko:"밑에"},{en:"someday",ko:"언젠가"},{en:"forth",ko:"앞으로"},{en:"upstairs",ko:"위층으로"},{en:"underneath",ko:"아래에"},{en:"downward",ko:"아래로"},{en:"overnight",ko:"밤새"},{en:"nationwide",ko:"전국적으로"}],
+  9:[{en:"hardly",ko:"거의 ~않다"},{en:"rarely",ko:"드물게, 거의 ~않다"},{en:"barely",ko:"거의 ~않다, 간신히"},{en:"seldom",ko:"좀처럼 ~않다"},{en:"scarcely",ko:"거의 ~않다"},{en:"badly",ko:"심하게, 나쁘게"},{en:"beyond",ko:"~너머, 이상으로"},{en:"till",ko:"~까지"},{en:"afterward",ko:"나중에, 그 후에"},{en:"thereafter",ko:"그 이후에"},{en:"accordingly",ko:"따라서, 그에 맞게"},{en:"despite",ko:"~에도 불구하고"},{en:"except",ko:"~을 제외하고"},{en:"per",ko:"~당, ~마다"},{en:"unlike",ko:"~와 달리"},{en:"regardless of",ko:"~에 관계없이"},{en:"according to",ko:"~에 따르면"},{en:"owing to",ko:"~때문에"},{en:"thanks to",ko:"~덕분에"},{en:"nevertheless",ko:"그럼에도 불구하고"},{en:"otherwise",ko:"그렇지 않으면"},{en:"while",ko:"~인 반면에, ~동안"},{en:"nonetheless",ko:"그럼에도 불구하고"},{en:"therefore",ko:"그러므로"},{en:"since",ko:"~이므로, ~이후"},{en:"moreover",ko:"게다가"},{en:"furthermore",ko:"더욱이"},{en:"in addition",ko:"게다가"},{en:"likewise",ko:"마찬가지로"}],
+  10:[{en:"sequence",ko:"순서, 연속"},{en:"experienced",ko:"경험 있는, 노련한"},{en:"expert",ko:"전문가"},{en:"potential",ko:"잠재적인, 가능성"},{en:"retire",ko:"은퇴하다"},{en:"burst",ko:"터지다, 폭발하다"},{en:"enemy",ko:"적"},{en:"security",ko:"안보, 보안"},{en:"invade",ko:"침략하다"},{en:"crack",ko:"금이 가다, 균열"},{en:"risk",ko:"위험"},{en:"hazard",ko:"위험"},{en:"crash",ko:"충돌하다"},{en:"flame",ko:"불꽃"},{en:"destroy",ko:"파괴하다"},{en:"survive",ko:"살아남다"},{en:"victim",ko:"피해자, 희생자"},{en:"hostile",ko:"적대적인"},{en:"kidnap",ko:"납치하다"},{en:"postpone",ko:"미루다, 연기하다"},{en:"inform",ko:"알리다"},{en:"boast",ko:"자랑하다"},{en:"annoy",ko:"불쾌하게 하다"},{en:"attack",ko:"공격하다"},{en:"shoot",ko:"쏘다"},{en:"endure",ko:"참다, 견디다"},{en:"bleed",ko:"피를 흘리다"},{en:"defeat",ko:"물리치다"},{en:"absurd",ko:"말도 안 되는"}],
+11:[{en:"shield",ko:"방패"},{en:"individual",ko:"개인(의)"},{en:"thunder",ko:"천둥"},{en:"outstanding",ko:"뛰어난"},{en:"weapon",ko:"무기"},{en:"mighty",ko:"강력한"},{en:"sword",ko:"검, 칼"},{en:"arrow",ko:"화살"},{en:"web",ko:"거미줄; 웹"},{en:"insect",ko:"곤충"},{en:"alien",ko:"외계인; 외국인"},{en:"collaborate",ko:"협력하다"},{en:"fierce",ko:"사나운, 격렬한"},{en:"intelligence",ko:"지능, 지성"},{en:"extraordinary",ko:"비범한"},{en:"rapid",ko:"빠른"},{en:"superior",ko:"우월한"},{en:"conquer",ko:"정복하다"},{en:"confront",ko:"맞서다"},{en:"manage",ko:"관리하다"},{en:"disagree",ko:"동의하지 않다"},{en:"divide",ko:"분열되다"},{en:"tragic",ko:"비극적인"},{en:"severe",ko:"극심한"},{en:"differ",ko:"다르다"},{en:"trait",ko:"특성, 특질"},{en:"ultimate",ko:"궁극적인"},{en:"recognize",ko:"인지하다"},{en:"unite",ko:"연합하다"}],
+  12:[{en:"detective",ko:"탐정, 형사"},{en:"mystery",ko:"미스터리"},{en:"incident",ko:"사건"},{en:"theft",ko:"절도"},{en:"jewel",ko:"보석"},{en:"burglar",ko:"도둑"},{en:"clue",ko:"단서"},{en:"suspect",ko:"용의자; 의심하다"},{en:"suspicion",ko:"의심"},{en:"scan",ko:"훑어보다"},{en:"proof",ko:"증거"},{en:"certain",ko:"확실한"},{en:"escape",ko:"탈출하다"},{en:"chase",ko:"쫓다"},{en:"arrest",ko:"체포하다"},{en:"handcuff",ko:"수갑"},{en:"law",ko:"법"},{en:"legal",ko:"합법적인"},{en:"trial",ko:"재판; 시도"},{en:"court",ko:"법원; 코트"},{en:"evidence",ko:"증거"},{en:"witness",ko:"목격자"},{en:"jury",ko:"배심원"},{en:"guilty",ko:"유죄의; 죄책감"},{en:"confess",ko:"자백하다"},{en:"fake",ko:"가짜의"}],
+  13:[{en:"civilization",ko:"문명"},{en:"economy",ko:"경제"},{en:"astronaut",ko:"우주비행사"},{en:"signal",ko:"신호"},{en:"interpret",ko:"해석하다"},{en:"indicate",ko:"나타내다"},{en:"universe",ko:"우주"},{en:"exist",ko:"존재하다"},{en:"persuade",ko:"설득하다"},{en:"laboratory",ko:"실험실"},{en:"delicate",ko:"섬세한"},{en:"advanced",ko:"발전된"},{en:"device",ko:"장치"},{en:"observe",ko:"관찰하다"},{en:"contact",ko:"연락; 접촉"},{en:"document",ko:"문서"},{en:"explore",ko:"탐험하다"},{en:"genius",ko:"천재"},{en:"examine",ko:"검사하다"},{en:"acknowledge",ko:"인정하다"},{en:"assume",ko:"추정하다"},{en:"relative",ko:"상대적인; 친척"},{en:"effective",ko:"효과적인"},{en:"humanity",ko:"인류"},{en:"accomplish",ko:"성취하다"}],
+  14:[{en:"combine",ko:"결합하다"},{en:"chef",ko:"요리사"},{en:"popularity",ko:"인기"},{en:"publish",ko:"출판하다"},{en:"celebrity",ko:"유명인"},{en:"entertain",ko:"즐겁게 하다"},{en:"instruction",ko:"설명, 지시"},{en:"compete",ko:"경쟁하다"},{en:"create",ko:"만들다"},{en:"ingredient",ko:"재료"},{en:"reward",ko:"보상"},{en:"recipe",ko:"레시피"},{en:"raw",ko:"날것의"},{en:"salmon",ko:"연어"},{en:"vegetarian",ko:"채식주의자"},{en:"chop",ko:"잘게 썰다"},{en:"rotten",ko:"썩은"},{en:"stir",ko:"젓다"},{en:"spicy",ko:"매운"},{en:"flavor",ko:"맛, 풍미"},{en:"roast",ko:"굽다"},{en:"sour",ko:"신"},{en:"flour",ko:"밀가루"},{en:"wheat",ko:"밀"},{en:"pot",ko:"냄비"},{en:"lid",ko:"뚜껑"},{en:"bowl",ko:"그릇"},{en:"sip",ko:"조금씩 마시다"},{en:"dip",ko:"살짝 담그다"},{en:"chew",ko:"씹다"},{en:"swallow",ko:"삼키다"},{en:"leftover",ko:"남은 음식"}],
+  15:[{en:"artificial",ko:"인공의"},{en:"machinery",ko:"기계류"},{en:"concern",ko:"걱정; 관심사"},{en:"ease",ko:"편안함"},{en:"equipment",ko:"장비"},{en:"independent",ko:"독립적인"},{en:"threat",ko:"위협"},{en:"replace",ko:"대체하다"},{en:"influence",ko:"영향"},{en:"frightening",ko:"무서운"},{en:"continuous",ko:"지속적인"},{en:"identify",ko:"식별하다"},{en:"imitate",ko:"모방하다"},{en:"express",ko:"표현하다"},{en:"operate",ko:"작동하다"},{en:"automobile",ko:"자동차"},{en:"automatic",ko:"자동의"},{en:"predict",ko:"예측하다"},{en:"analyze",ko:"분석하다"},{en:"expand",ko:"확장되다"},{en:"numerous",ko:"수많은"},{en:"widespread",ko:"광범위한"},{en:"social",ko:"사회의"},{en:"household",ko:"가정"},{en:"standard",ko:"기준"},{en:"related",ko:"관련된"},{en:"education",ko:"교육"},{en:"emotion",ko:"감정"}],
+  16:[{en:"objective",ko:"목표; 객관적인"},{en:"aim",ko:"목표"},{en:"target",ko:"목표; 겨냥하다"},{en:"amazing",ko:"놀라운"},{en:"master",ko:"숙달하다; 전문가"},{en:"situation",ko:"상황"},{en:"determined",ko:"결심한"},{en:"semester",ko:"학기"},{en:"primary",ko:"주된"},{en:"devote",ko:"헌신하다"},{en:"accurate",ko:"정확한"},{en:"acquire",ko:"습득하다"},{en:"struggle",ko:"발버둥치다"},{en:"chart",ko:"도표"},{en:"detail",ko:"세부사항"},{en:"regular",ko:"규칙적인"},{en:"arrange",ko:"정리하다"},{en:"specific",ko:"구체적인"},{en:"effort",ko:"노력"},{en:"constant",ko:"지속적인"},{en:"advice",ko:"조언"},{en:"encourage",ko:"격려하다"},{en:"attempt",ko:"시도하다"},{en:"range",ko:"범위"},{en:"text",ko:"글, 본문"},{en:"summarize",ko:"요약하다"}],
+  17:[{en:"principle",ko:"원칙"},{en:"entrance",ko:"입구; 입학"},{en:"reputation",ko:"명성"},{en:"institution",ko:"기관"},{en:"stubborn",ko:"완고한"},{en:"greeting",ko:"인사"},{en:"curriculum",ko:"교육과정"},{en:"authority",ko:"권위"},{en:"regulate",ko:"규제하다"},{en:"lecture",ko:"강의"},{en:"distract",ko:"주의를 분산시키다"},{en:"paragraph",ko:"단락"},{en:"encourage",ko:"격려하다"},{en:"slight",ko:"약간의"},{en:"concept",ko:"개념"},{en:"angle",ko:"각도; 관점"},{en:"instinct",ko:"본능"},{en:"seize",ko:"붙잡다"},{en:"internal",ko:"내부의"},{en:"realize",ko:"깨닫다"},{en:"literature",ko:"문학"},{en:"society",ko:"사회"},{en:"underground",ko:"지하(의)"},{en:"associate",ko:"어울리다"},{en:"intimate",ko:"친밀한"},{en:"freedom",ko:"자유"},{en:"self-esteem",ko:"자존감"},{en:"ideal",ko:"이상적인"}],
+  18:[{en:"deny",ko:"부정하다"},{en:"comprehend",ko:"이해하다"},{en:"ethnic",ko:"민족의"},{en:"insist",ko:"주장하다"},{en:"narrow-minded",ko:"편협한"},{en:"convince",ko:"확신시키다"},{en:"mutual",ko:"상호의"},{en:"accustom",ko:"익숙하게 하다"},{en:"competent",ko:"능력 있는"},{en:"suburb",ko:"교외"},{en:"hospitality",ko:"환대"},{en:"hometown",ko:"고향"},{en:"homesick",ko:"향수병에 걸린"},{en:"racism",ko:"인종차별주의"},{en:"frustrated",ko:"좌절한"},{en:"ignore",ko:"무시하다"},{en:"courtesy",ko:"예의"},{en:"awkward",ko:"어색한"},{en:"passive",ko:"수동적인"},{en:"appeal",ko:"매력; 호소하다"},{en:"peninsula",ko:"반도"},{en:"attire",ko:"의상"},{en:"oriental",ko:"동양의"},{en:"specialty",ko:"특산품"},{en:"skyscraper",ko:"고층 건물"},{en:"historic",ko:"역사적으로 중요한"}],
+  19:[{en:"dynasty",ko:"왕조"},{en:"pioneer",ko:"선구자"},{en:"revolution",ko:"혁명"},{en:"triumph",ko:"승리"},{en:"warrior",ko:"전사"},{en:"festive",ko:"축제의"},{en:"ceremony",ko:"의식"},{en:"construction",ko:"건설"},{en:"landmark",ko:"랜드마크"},{en:"exhibit",ko:"전시하다"},{en:"portrait",ko:"초상화"},{en:"masterpiece",ko:"걸작"},{en:"statue",ko:"조각상"},{en:"sculpture",ko:"조각품"},{en:"folk",ko:"민속의"},{en:"performance",ko:"공연"},{en:"chant",ko:"구호"},{en:"pitch",ko:"음높이"},{en:"journey",ko:"여행"},{en:"destination",ko:"목적지"},{en:"transportation",ko:"교통"},{en:"passenger",ko:"승객"},{en:"luggage",ko:"짐"},{en:"hike",ko:"하이킹"},{en:"compass",ko:"나침반"},{en:"carriage",ko:"마차"},{en:"shortcut",ko:"지름길"},{en:"route",ko:"경로"},{en:"souvenir",ko:"기념품"},{en:"spacecraft",ko:"우주선"}],
+  20:[{en:"commute",ko:"통근하다"},{en:"downtown",ko:"도심"},{en:"traffic",ko:"교통량"},{en:"vehicle",ko:"차량"},{en:"rush",ko:"서두르다"},{en:"irritated",ko:"짜증난"},{en:"exhausted",ko:"지쳐버린"},{en:"stress",ko:"스트레스"},{en:"fatigue",ko:"피로"},{en:"yawn",ko:"하품하다"},{en:"sore",ko:"아픈"},{en:"anxiety",ko:"불안"},{en:"disturb",ko:"방해하다"},{en:"focus",ko:"집중하다"},{en:"dramatic",ko:"극적인"},{en:"inhale",ko:"숨을 들이쉬다"},{en:"exhale",ko:"숨을 내쉬다"},{en:"sight",ko:"시력; 광경"},{en:"stiff",ko:"뻣뻣한"},{en:"straighten",ko:"펴다"},{en:"muscle",ko:"근육"},{en:"chest",ko:"가슴"},{en:"refresh",ko:"상쾌하게 하다"},{en:"bathe",ko:"씻다"},{en:"improve",ko:"향상시키다"},{en:"patience",ko:"인내심"},{en:"academic",ko:"학업의"},{en:"steady",ko:"꾸준한"},{en:"decrease",ko:"감소하다"},{en:"loose",ko:"느슨한"}],
+  21:[{en:"novel",ko:"소설; 새로운"},{en:"classic",ko:"고전(의)"},{en:"charm",ko:"매력"},{en:"typical",ko:"전형적인"},{en:"disgusting",ko:"역겨운"},{en:"furious",ko:"몹시 화난"},{en:"embarrassed",ko:"당황한"},{en:"grateful",ko:"감사하는"},{en:"regret",ko:"후회(하다)"},{en:"admire",ko:"존경하다"},{en:"swear",ko:"맹세하다; 욕하다"},{en:"spouse",ko:"배우자"},{en:"delight",ko:"기쁨"},{en:"acquaintance",ko:"지인"},{en:"encounter",ko:"마주치다"},{en:"blush",ko:"얼굴이 붉어지다"},{en:"mature",ko:"성숙한"},{en:"beloved",ko:"사랑하는"},{en:"widow",ko:"미망인"},{en:"inherit",ko:"상속받다"},{en:"income",ko:"소득"},{en:"bankrupt",ko:"파산한"},{en:"welfare",ko:"복지"},{en:"fond",ko:"좋아하는"},{en:"sorrow",ko:"슬픔"},{en:"disappoint",ko:"실망시키다"},{en:"heartbroken",ko:"가슴이 아픈"},{en:"emotional",ko:"감정적인"},{en:"adore",ko:"매우 좋아하다"}],
+  22:[{en:"personality",ko:"성격"},{en:"positive",ko:"긍정적인"},{en:"challenge",ko:"도전(하다)"},{en:"brilliant",ko:"훌륭한"},{en:"helpless",ko:"무력한"},{en:"passionate",ko:"열정적인"},{en:"leisure",ko:"여가"},{en:"easygoing",ko:"느긋한"},{en:"outgoing",ko:"외향적인"},{en:"impression",ko:"인상"},{en:"absent-minded",ko:"멍한"},{en:"timid",ko:"소심한"},{en:"uneasy",ko:"불안한"},{en:"jealous",ko:"질투하는"},{en:"doubt",ko:"의심(하다)"},{en:"misunderstand",ko:"오해하다"},{en:"conflict",ko:"갈등"},{en:"appropriate",ko:"적절한"},{en:"honesty",ko:"정직"},{en:"adjust",ko:"적응하다"},{en:"tolerant",ko:"관대한"},{en:"gradual",ko:"점진적인"},{en:"trust",ko:"신뢰(하다)"},{en:"ignore",ko:"무시하다"},{en:"rely",ko:"의지하다"}],
+  23:[{en:"occupation",ko:"직업"},{en:"advertisement",ko:"광고"},{en:"specialize",ko:"전문으로 하다"},{en:"profession",ko:"전문직"},{en:"client",ko:"고객"},{en:"architect",ko:"건축가"},{en:"psychologist",ko:"심리학자"},{en:"accountant",ko:"회계사"},{en:"consult",ko:"상담하다"},{en:"counselor",ko:"상담사"},{en:"criticize",ko:"비평하다"},{en:"mechanic",ko:"기계공"},{en:"technician",ko:"기술자"},{en:"tutor",ko:"개인 교사"},{en:"broadcaster",ko:"방송인"},{en:"compose",ko:"작곡하다"},{en:"nanny",ko:"보모"},{en:"translate",ko:"번역하다"},{en:"author",ko:"저자"},{en:"essay",ko:"수필"},{en:"fiction",ko:"소설, 허구"},{en:"contract",ko:"계약서"},{en:"poet",ko:"시인"},{en:"editor",ko:"편집자"},{en:"conference",ko:"회의"}],
+  24:[{en:"senior",ko:"연장자"},{en:"elder",ko:"손윗사람"},{en:"interrupt",ko:"방해하다"},{en:"frown",ko:"눈살을 찌푸리다"},{en:"bump",ko:"부딪히다"},{en:"aisle",ko:"통로"},{en:"attraction",ko:"매력; 명소"},{en:"formal",ko:"공식적인"},{en:"annoy",ko:"짜증나게 하다"},{en:"stare",ko:"빤히 쳐다보다"},{en:"funeral",ko:"장례식"},{en:"permit",ko:"허락하다"},{en:"belongings",ko:"소지품"},{en:"differ",ko:"다르다"},{en:"define",ko:"정의하다"},{en:"gap",ko:"격차"},{en:"respect",ko:"존중(하다)"},{en:"custom",ko:"관습"},{en:"insult",ko:"모욕(하다)"},{en:"clap",ko:"박수를 치다"},{en:"bless",ko:"축복하다"},{en:"religion",ko:"종교"},{en:"cherish",ko:"소중히 여기다"},{en:"acceptable",ko:"수락할 수 있는"},{en:"refuse",ko:"거절하다"},{en:"cheek",ko:"뺨"}],
+  25:[{en:"democracy",ko:"민주주의"},{en:"communism",ko:"공산주의"},{en:"capitalism",ko:"자본주의"},{en:"socialism",ko:"사회주의"},{en:"republic",ko:"공화국"},{en:"patriot",ko:"애국자"},{en:"organization",ko:"조직"},{en:"government",ko:"정부"},{en:"parliament",ko:"의회"},{en:"committee",ko:"위원회"},{en:"council",ko:"의회"},{en:"union",ko:"연합"},{en:"politician",ko:"정치인"},{en:"minister",ko:"장관"},{en:"chairperson",ko:"의장"},{en:"representative",ko:"대표자"},{en:"spokesperson",ko:"대변인"},{en:"mayor",ko:"시장"},{en:"candidate",ko:"후보자"},{en:"announce",ko:"발표하다"},{en:"statement",ko:"성명"},{en:"controversy",ko:"논란"},{en:"oppose",ko:"반대하다"},{en:"negotiate",ko:"협상하다"},{en:"approve",ko:"승인하다"},{en:"poll",ko:"여론조사"},{en:"declare",ko:"선언하다"},{en:"nationality",ko:"국적"},{en:"military",ko:"군대"}],
+  26:[{en:"poverty",ko:"빈곤"},{en:"drought",ko:"가뭄"},{en:"necessity",ko:"필요성"},{en:"shortage",ko:"부족"},{en:"lifespan",ko:"수명"},{en:"cancer",ko:"암"},{en:"unemployment",ko:"실업"},{en:"hire",ko:"고용하다"},{en:"worsen",ko:"악화되다"},{en:"hardship",ko:"고난"},{en:"violent",ko:"폭력적인"},{en:"chaos",ko:"혼돈"},{en:"border",ko:"국경"},{en:"fever",ko:"열"},{en:"dizzy",ko:"어지러운"},{en:"pale",ko:"창백한"},{en:"faint",ko:"기절하다"},{en:"physician",ko:"내과 의사"},{en:"surgery",ko:"수술"},{en:"bandage",ko:"붕대"},{en:"pharmacy",ko:"약국"},{en:"cure",ko:"치유하다"},{en:"pill",ko:"알약"},{en:"treatment",ko:"치료"},{en:"fund",ko:"기금"},{en:"cultivate",ko:"경작하다"},{en:"produce",ko:"생산하다"}],
+  27:[{en:"society",ko:"사회"},{en:"status",ko:"지위"},{en:"wealth",ko:"부, 재산"},{en:"property",ko:"재산"},{en:"rank",ko:"계급"},{en:"moral",ko:"도덕적인"},{en:"obey",ko:"복종하다"},{en:"forbid",ko:"금지하다"},{en:"possess",ko:"소유하다"},{en:"responsible",ko:"책임감 있는"},{en:"reasonable",ko:"합리적인"},{en:"flexible",ko:"유연한"},{en:"conscious",ko:"의식하는"},{en:"noble",ko:"고귀한"},{en:"duty",ko:"의무"},{en:"donate",ko:"기부하다"},{en:"contribute",ko:"기여하다"},{en:"willing",ko:"기꺼이 하는"},{en:"luxury",ko:"사치(품)"},{en:"mentor",ko:"멘토"},{en:"establish",ko:"설립하다"},{en:"salary",ko:"급여"},{en:"disabled",ko:"장애를 가진"},{en:"sponsor",ko:"후원하다"},{en:"charity",ko:"자선단체"},{en:"cooperate",ko:"협력하다"},{en:"distribute",ko:"분배하다"}],
+  28:[{en:"prompt",ko:"즉각적인"},{en:"spread",ko:"퍼지다"},{en:"response",ko:"반응"},{en:"disaster",ko:"재난"},{en:"marvelous",ko:"놀라운"},{en:"fascinate",ko:"매혹하다"},{en:"complex",ko:"복잡한"},{en:"equal",ko:"동등한"},{en:"mood",ko:"기분"},{en:"journal",ko:"일지"},{en:"distant",ko:"먼"},{en:"obstacle",ko:"장애물"},{en:"peer",ko:"또래"},{en:"fame",ko:"명성"},{en:"precise",ko:"정확한"},{en:"significant",ko:"중요한"},{en:"alarm",ko:"경보"},{en:"nightmare",ko:"악몽"},{en:"irony",ko:"아이러니"},{en:"proper",ko:"적절한"},{en:"distinguish",ko:"구별하다"},{en:"criminal",ko:"범죄자"},{en:"obtain",ko:"얻다"},{en:"warn",ko:"경고하다"},{en:"shame",ko:"수치심"},{en:"envy",ko:"부러워하다"}],
+  29:[{en:"ecosystem",ko:"생태계"},{en:"trash",ko:"쓰레기"},{en:"junk",ko:"잡동사니"},{en:"decay",ko:"부패하다"},{en:"environment",ko:"환경"},{en:"toxic",ko:"유독한"},{en:"coal",ko:"석탄"},{en:"gasoline",ko:"휘발유"},{en:"pollute",ko:"오염시키다"},{en:"greenhouse",ko:"온실"},{en:"atmosphere",ko:"대기"},{en:"acid",ko:"산(酸)"},{en:"iceberg",ko:"빙산"},{en:"melt",ko:"녹다"},{en:"flood",ko:"홍수"},{en:"typhoon",ko:"태풍"},{en:"earthquake",ko:"지진"},{en:"freeze",ko:"얼다"},{en:"reduce",ko:"줄이다"},{en:"protect",ko:"보호하다"},{en:"resource",ko:"자원"},{en:"consume",ko:"소비하다"},{en:"alternative",ko:"대체(의)"},{en:"oxygen",ko:"산소"},{en:"preserve",ko:"보존하다"},{en:"recycle",ko:"재활용하다"},{en:"seek",ko:"찾다"}],
+  30:[{en:"nursery",ko:"보육원"},{en:"kindergarten",ko:"유치원"},{en:"stuff",ko:"물건"},{en:"allowance",ko:"용돈"},{en:"routine",ko:"일상"},{en:"chore",ko:"집안일"},{en:"blanket",ko:"담요"},{en:"fabric",ko:"직물"},{en:"stitch",ko:"바느질하다"},{en:"closet",ko:"벽장"},{en:"polish",ko:"광을 내다"},{en:"scrub",ko:"문질러 닦다"},{en:"broom",ko:"빗자루"},{en:"garbage",ko:"쓰레기"},{en:"mend",ko:"수선하다"},{en:"sweat",ko:"땀"},{en:"successive",ko:"연속적인"},{en:"tidy",ko:"깔끔한"},{en:"outlet",ko:"콘센트"},{en:"cart",ko:"카트"},{en:"display",ko:"진열하다"},{en:"pillow",ko:"베개"},{en:"discount",ko:"할인"},{en:"shelf",ko:"선반"},{en:"stereotype",ko:"고정관념"},{en:"discourage",ko:"낙담시키다"},{en:"burden",ko:"부담"},{en:"endure",ko:"견디다"}],
+  31:[{en:"found",ko:"설립하다"},{en:"inspire",ko:"영감을 주다"},{en:"technology",ko:"기술"},{en:"extend",ko:"확장하다"},{en:"enthusiasm",ko:"열정"},{en:"electronic",ko:"전자의"},{en:"distinct",ko:"구별되는"},{en:"innovation",ko:"혁신"},{en:"emphasize",ko:"강조하다"},{en:"elaborate",ko:"정교한"},{en:"launch",ko:"출시하다"},{en:"endless",ko:"끝없는"},{en:"employ",ko:"고용하다"},{en:"simplify",ko:"단순화하다"},{en:"philosophy",ko:"철학"},{en:"restrict",ko:"제한하다"},{en:"memorize",ko:"암기하다"},{en:"department",ko:"부서"},{en:"fulfill",ko:"이루다"},{en:"merchandise",ko:"상품"},{en:"improve",ko:"향상시키다"},{en:"media",ko:"미디어"},{en:"imagination",ko:"상상력"},{en:"biography",ko:"전기, 일대기"},{en:"phrase",ko:"구절"},{en:"quote",ko:"인용하다"},{en:"theme",ko:"주제"},{en:"legend",ko:"전설"}],
+  32:[{en:"appoint",ko:"임명하다"},{en:"dare",ko:"감히 ~하다"},{en:"continue",ko:"계속하다"},{en:"nonsense",ko:"터무니없는 말"},{en:"belief",ko:"믿음"},{en:"inner",ko:"내면의"},{en:"harbor",ko:"항구; 품다"},{en:"essential",ko:"핵심적인"},{en:"smooth",ko:"매끄러운"},{en:"pray",ko:"기도하다"},{en:"deed",ko:"행동"},{en:"quit",ko:"그만두다"},{en:"policy",ko:"정책"},{en:"core",ko:"핵심"},{en:"strategy",ko:"전략"},{en:"limitation",ko:"한계"},{en:"instant",ko:"즉각적인"},{en:"guard",ko:"지키다"},{en:"holy",ko:"신성한"},{en:"inward",ko:"내면의"},{en:"courage",ko:"용기"},{en:"venture",ko:"모험하다"},{en:"pursue",ko:"추구하다"},{en:"destiny",ko:"운명"},{en:"despair",ko:"절망하다"},{en:"reveal",ko:"드러내다"}],
+  33:[{en:"professor",ko:"교수"},{en:"companion",ko:"동료"},{en:"neighborhood",ko:"이웃"},{en:"blame",ko:"탓하다"},{en:"aware",ko:"알고 있는"},{en:"nap",ko:"낮잠"},{en:"rush",ko:"서두르다"},{en:"crucial",ko:"중대한"},{en:"leap",ko:"도약하다"},{en:"pace",ko:"속도"},{en:"collapse",ko:"붕괴하다"},{en:"platform",ko:"승강장"},{en:"await",ko:"기다리다"},{en:"scent",ko:"향기"},{en:"trace",ko:"흔적"},{en:"starve",ko:"굶주리다"},{en:"wander",ko:"방랑하다"},{en:"sympathy",ko:"공감"},{en:"decade",ko:"10년"},{en:"lifetime",ko:"일생"},{en:"crisis",ko:"위기"},{en:"loyalty",ko:"충성심"},{en:"recall",ko:"기억하다"},{en:"separate",ko:"헤어지다"},{en:"enhance",ko:"증대시키다"},{en:"precious",ko:"소중한"},{en:"infant",ko:"유아"}],
+  34:[{en:"youth",ko:"청소년"},{en:"sunlight",ko:"햇빛"},{en:"sunset",ko:"일몰"},{en:"innocent",ko:"순진한"},{en:"pure",ko:"순수한"},{en:"progress",ko:"진행하다"},{en:"occur",ko:"일어나다"},{en:"afford",ko:"여유가 되다"},{en:"sigh",ko:"한숨"},{en:"startle",ko:"깜짝 놀라게 하다"},{en:"inquire",ko:"묻다"},{en:"request",ko:"요청하다"},{en:"financial",ko:"재정적인"},{en:"adulthood",ko:"성인기"},{en:"pressure",ko:"압박"},{en:"desire",ko:"욕구"},{en:"propose",ko:"제안하다"},{en:"pleasure",ko:"기쁨"},{en:"buddy",ko:"친구"},{en:"voyage",ko:"항해"},{en:"sympathy",ko:"동정심"},{en:"hesitate",ko:"주저하다"},{en:"sacrifice",ko:"희생하다"},{en:"selfish",ko:"이기적인"},{en:"sufficient",ko:"충분한"}],
+  35:[{en:"greedy",ko:"탐욕스러운"},{en:"gain",ko:"얻다; 이익"},{en:"golden",ko:"황금의"},{en:"frustrate",ko:"좌절시키다"},{en:"warn",ko:"경고하다"},{en:"ability",ko:"능력"},{en:"grab",ko:"붙잡다"},{en:"vary",ko:"다르다"},{en:"accomplish",ko:"성취하다"},{en:"entertainment",ko:"오락"},{en:"hunger",ko:"굶주림"},{en:"servant",ko:"하인"},{en:"diligent",ko:"부지런한"},{en:"puzzle",ko:"퍼즐"},{en:"panic",ko:"공황"},{en:"outcome",ko:"결과"},{en:"indifferent",ko:"무관심한"},{en:"refuse",ko:"거절하다"},{en:"pardon",ko:"용서하다"},{en:"scold",ko:"꾸짖다"},{en:"miracle",ko:"기적"},{en:"essential",ko:"필수적인"},{en:"excessive",ko:"과도한"},{en:"sight",ko:"광경"},{en:"glittering",ko:"반짝이는"}],
+  36:[{en:"address",ko:"주소; 연설하다"},{en:"balance",ko:"균형; 잔고"},{en:"bank",ko:"은행; 둑"},{en:"bill",ko:"계산서; 지폐"},{en:"blue",ko:"파란; 우울한"},{en:"book",ko:"책; 예약하다"},{en:"branch",ko:"나뭇가지; 분점"},{en:"capital",ko:"수도; 자본"},{en:"company",ko:"회사; 친구"},{en:"counter",ko:"계산대; 반박하다"},{en:"desert",ko:"사막; 버리다"},{en:"face",ko:"얼굴; 직면하다"},{en:"fair",ko:"공정한; 박람회"},{en:"fine",ko:"벌금; 좋은"},{en:"fire",ko:"불; 해고하다"},{en:"game",ko:"게임; 사냥감"},{en:"general",ko:"일반적인; 장군"},{en:"interest",ko:"흥미; 이자"},{en:"last",ko:"마지막의; 지속되다"},{en:"long",ko:"긴; 갈망하다"},{en:"spell",ko:"주문; 철자를 쓰다"},{en:"mean",ko:"못된; 의미하다"}],
+  37:[{en:"meet",ko:"만나다; 충족시키다"},{en:"mine",ko:"나의 것; 광산"},{en:"party",ko:"일행; 정당"},{en:"pet",ko:"애완동물"},{en:"please",ko:"부디; 기쁘게 하다"},{en:"race",ko:"경주; 인종"},{en:"right",ko:"옳은; 권리"},{en:"room",ko:"방; 공간"},{en:"safe",ko:"안전한; 금고"},{en:"school",ko:"학교; 무리"},{en:"screen",ko:"화면; 차단하다"},{en:"season",ko:"계절; 양념하다"},{en:"sentence",ko:"문장; 선고"},{en:"share",ko:"공유하다; 몫"},{en:"solution",ko:"해결책; 용액"},{en:"still",ko:"가만히; 여전히"},{en:"store",ko:"저장하다; 가게"},{en:"tear",ko:"찢다; 눈물"},{en:"well",ko:"우물; 잘"},{en:"will",ko:"의지; ~할 것이다"}],
+  38:[{en:"carry",ko:"나르다"},{en:"beat",ko:"두드리다"},{en:"chance",ko:"기회; 우연"},{en:"change",ko:"변하다; 변화"},{en:"character",ko:"기호; 특징"},{en:"check",ko:"억제하다; 확인하다"},{en:"class",ko:"계층; 수업"},{en:"condition",ko:"조건; 상황"},{en:"count",ko:"세다; 중요하다"},{en:"degree",ko:"정도; 학위"},{en:"draw",ko:"그리다; 끌다"},{en:"match",ko:"경기; 어울리다"},{en:"matter",ko:"중요하다; 문제"},{en:"move",ko:"움직이다; 감동시키다"},{en:"order",ko:"명령하다; 주문하다"}],
+  39:[{en:"pay",ko:"지불하다"},{en:"plain",ko:"간결한; 분명한"},{en:"present",ko:"선물; 현재의"},{en:"raise",ko:"올리다; 모금하다"},{en:"rate",ko:"비율; 속도"},{en:"sign",ko:"표지판; 서명하다"},{en:"spot",ko:"발견하다; 장소"},{en:"support",ko:"지지하다"},{en:"track",ko:"추적하다"},{en:"treat",ko:"대우하다; 치료하다"},{en:"volume",ko:"부피; 음량"}],
+  40:[{en:"serve",ko:"제공하다"},{en:"agency",ko:"대행 기관"},{en:"air",ko:"공기"},{en:"lead",ko:"이끌다; 납"},{en:"course",ko:"과정; 코스"},{en:"quarter",ko:"4분의 1"},{en:"root",ko:"뿌리; 근원"},{en:"work",ko:"일(하다); 작동하다"}],
+  41:[{en:"find",ko:"찾다"},{en:"found",ko:"설립하다"},{en:"formal",ko:"격식을 차린"},{en:"former",ko:"예전의; 전자"},{en:"affect",ko:"영향을 미치다"},{en:"effect",ko:"영향, 효과"},{en:"sit",ko:"앉다"},{en:"seat",ko:"좌석"},{en:"raw",ko:"날것의"},{en:"row",ko:"줄, 행"},{en:"adapt",ko:"적응하다"},{en:"adopt",ko:"채택하다"},{en:"principal",ko:"교장; 주요한"},{en:"principle",ko:"원칙"},{en:"wander",ko:"방랑하다"},{en:"wonder",ko:"궁금해하다"},{en:"diary",ko:"일기"},{en:"daily",ko:"매일의"},{en:"dairy",ko:"유제품"},{en:"quite",ko:"꽤"},{en:"quiet",ko:"조용한"},{en:"lie",ko:"거짓말하다; 눕다"},{en:"lay",ko:"놓다"}],
+  42:[{en:"loyal",ko:"충실한"},{en:"royal",ko:"왕실의"},{en:"bald",ko:"대머리의"},{en:"bold",ko:"용감한; 굵은"},{en:"access",ko:"접근(권)"},{en:"assess",ko:"평가하다"},{en:"wind",ko:"감다; 돌리다"},{en:"wound",ko:"상처"},{en:"aboard",ko:"탑승한"},{en:"abroad",ko:"해외에(서)"},{en:"personal",ko:"개인적인"},{en:"personnel",ko:"직원"},{en:"expand",ko:"확장하다"},{en:"expend",ko:"소비하다"},{en:"leap",ko:"도약하다"},{en:"reap",ko:"수확하다"},{en:"saw",ko:"톱; 보았다"},{en:"sew",ko:"바느질하다"},{en:"sow",ko:"씨를 뿌리다"},{en:"despite",ko:"~에도 불구하고"},{en:"thorough",ko:"철저한"},{en:"through",ko:"~을 통해"}],
+  43:[{en:"social",ko:"사회의"},{en:"sociable",ko:"사교적인"},{en:"successful",ko:"성공한"},{en:"successive",ko:"연속적인"},{en:"sensible",ko:"분별 있는"},{en:"sensitive",ko:"예민한"},{en:"comparable",ko:"비슷한"},{en:"comparative",ko:"비교를 통한"},{en:"historical",ko:"역사(상)의"},{en:"historic",ko:"역사적으로 중요한"},{en:"imaginary",ko:"가상의"},{en:"imaginative",ko:"상상력이 풍부한"},{en:"imaginable",ko:"상상할 수 있는"},{en:"industrial",ko:"산업의"},{en:"industrious",ko:"부지런한"},{en:"considerate",ko:"사려 깊은"},{en:"considerable",ko:"상당한"},{en:"memorial",ko:"기념의"},{en:"memorable",ko:"기억할 만한"},{en:"respectable",ko:"존경할 만한"},{en:"respectful",ko:"공경하는"},{en:"childish",ko:"유치한"},{en:"childlike",ko:"어린애다운"},{en:"literal",ko:"글자 그대로의"},{en:"literate",ko:"읽고 쓸 줄 아는"},{en:"literary",ko:"문학의"},{en:"intelligent",ko:"총명한"},{en:"accessible",ko:"접근 가능한"},{en:"intellectual",ko:"지적인"}],
+  44:[{en:"collect",ko:"수집하다"},{en:"collective",ko:"공동의"},{en:"comprehend",ko:"이해하다"},{en:"comprehensive",ko:"포괄적인"},{en:"desire",ko:"바라다; 욕구"},{en:"desirable",ko:"바람직한"},{en:"occupy",ko:"차지하다"},{en:"occupation",ko:"직업"},{en:"compete",ko:"경쟁하다"},{en:"competent",ko:"능숙한"},{en:"respect",ko:"존경(하다)"},{en:"respective",ko:"각각의"},{en:"subject",ko:"주제; 과목"},{en:"subjective",ko:"주관적인"},{en:"complete",ko:"완전한"},{en:"intent",ko:"의도"},{en:"minute",ko:"분(分); 미세한"},{en:"objective",ko:"목표; 객관적인"},{en:"near",ko:"가까운"},{en:"nearly",ko:"거의"},{en:"late",ko:"늦은"},{en:"lately",ko:"최근에"},{en:"close",ko:"닫다; 가까운"},{en:"closely",ko:"밀접하게"},{en:"deep",ko:"깊은"},{en:"deeply",ko:"깊이"},{en:"name",ko:"이름"},{en:"namely",ko:"즉"},{en:"arm",ko:"팔"},{en:"arms",ko:"무기"},{en:"custom",ko:"관습"},{en:"customs",ko:"세관"},{en:"goods",ko:"상품"},{en:"manners",ko:"예절"},{en:"means",ko:"수단"},{en:"savings",ko:"저축"},{en:"someday",ko:"언젠가"},{en:"sometimes",ko:"때때로"}]
+};
+
+const SECTIONS = [
+  { label: "1~10강", range: [1,2,3,4,5,6,7,8,9,10], gridId: "grid-1-10" },
+  { label: "11~20강", range: [11,12,13,14,15,16,17,18,19,20], gridId: "grid-11-20" },
+  { label: "21~30강", range: [21,22,23,24,25,26,27,28,29,30], gridId: "grid-21-30" },
+  { label: "31~44강", range: [31,32,33,34,35,36,37,38,39,40,41,42,43,44], gridId: "grid-31-44" },
+];
+
+let selectedLesson = 1;
+let quizWords = [];
+let currentIdx = 0;
+let correctCount = 0;
+let wrongWords = [];
+let answered = false;
+
+function init() {
+  SECTIONS.forEach(sec => {
+    const grid = document.getElementById(sec.gridId);
+    sec.range.forEach(n => {
+      const btn = document.createElement('button');
+      btn.className = 'lesson-btn';
+      btn.innerHTML = `<span class="lesson-num">${n}</span><span class="lesson-count">${WORDS[n]?.length||0}개</span>`;
+      btn.onclick = () => startQuiz(n);
+      grid.appendChild(btn);
+    });
+  });
+}
+
+function startQuiz(n) {
+  selectedLesson = n;
+  quizWords = shuffle([...WORDS[n]]);
+  currentIdx = 0; correctCount = 0; wrongWords = []; answered = false;
+  document.getElementById('home-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'block';
+  document.getElementById('quiz-badge').textContent = n + '강';
+  showQuestion();
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function showQuestion() {
+  answered = false;
+  const w = quizWords[currentIdx];
+  document.getElementById('q-word').textContent = w.en;
+  document.getElementById('quiz-progress').textContent = `${currentIdx+1} / ${quizWords.length}`;
+  document.getElementById('progress-bar').style.width = `${(currentIdx/quizWords.length)*100}%`;
+  const input = document.getElementById('answer-input');
+  input.value = ''; input.className = 'answer-input'; input.disabled = false; input.focus();
+  document.getElementById('submit-btn').disabled = false;
+  document.getElementById('feedback-box').classList.remove('show');
+}
+
+function submitAnswer() {
+  if (answered) return;
+  const input = document.getElementById('answer-input');
+  const userAns = input.value.trim();
+  if (!userAns) return;
+  answered = true;
+  const correct = quizWords[currentIdx].ko;
+  input.disabled = true;
+  document.getElementById('submit-btn').disabled = true;
+  const isCorrect = checkAnswer(userAns, correct);
+  const fb = document.getElementById('feedback-box');
+  fb.classList.add('show');
+  if (isCorrect) {
+    correctCount++;
+    input.className = 'answer-input correct';
+    document.getElementById('feedback-text').innerHTML = '<span class="feedback-correct">✓ 정답!</span>';
+  } else {
+    wrongWords.push(quizWords[currentIdx]);
+    input.className = 'answer-input wrong';
+    document.getElementById('feedback-text').innerHTML = '<span class="feedback-wrong">✗ 오답</span>';
+  }
+  document.getElementById('feedback-answer').textContent = '정답: ' + correct;
+}
+
+function checkAnswer(user, correct) {
+  // 입력값 정규화
+  const normalize = (s) => s.replace(/[^가-힣a-z0-9]/gi, '').toLowerCase().trim();
+  const extractCore = (s) => s.replace(/하다$|되다$|이다$|시키다$|받다$|지다$|스럽다$|롭다$|답다$/,'').trim();
+
+  const u = normalize(user);
+  const uCore = extractCore(u);
+
+  // 정답을 ;,·/~ 로 나누기
+  const answers = correct.split(/[;,·\/~]/).map(a => a.trim()).filter(a => a);
+
+  for (const ans of answers) {
+    const a = normalize(ans);
+    const aCore = extractCore(a);
+
+    // 1. 완전 일치
+    if (u === a) return true;
+    // 2. 핵심어 일치 (어미 제거 후)
+    if (uCore && aCore && uCore === aCore) return true;
+    // 3. 포함 관계 (한쪽이 다른 쪽을 포함, 2글자 이상)
+    if (u.length >= 2 && a.includes(u)) return true;
+    if (a.length >= 2 && u.includes(a)) return true;
+    // 4. 핵심어 포함 관계
+    if (uCore.length >= 2 && aCore.includes(uCore)) return true;
+    if (aCore.length >= 2 && uCore.includes(aCore)) return true;
+  }
+  return false;
+}
+
+function nextQuestion() {
+  if (currentIdx < quizWords.length - 1) { currentIdx++; showQuestion(); }
+  else { showResult(); }
+}
+
+function showResult() {
+  document.getElementById('quiz-screen').style.display = 'none';
+  document.getElementById('result-screen').style.display = 'block';
+  const total = quizWords.length;
+  const pct = Math.round((correctCount / total) * 100);
+  document.getElementById('score-num').textContent = pct + '%';
+  document.getElementById('score-label').textContent = `${total}문제 중 ${correctCount}개 정답`;
+  const name = document.getElementById('student-name').value.trim() || '학생';
+  document.getElementById('result-sub').textContent = `${name} · ${selectedLesson}강`;
+  document.getElementById('result-emoji').textContent = pct >= 80 ? '🎉' : pct >= 60 ? '👍' : '💪';
+  document.getElementById('result-title').textContent = pct >= 80 ? '훌륭해요!' : pct >= 60 ? '잘 했어요!' : '다시 도전!';
+  const wl = document.getElementById('wrong-list');
+  wl.innerHTML = wrongWords.length > 0
+    ? `<div class="wrong-title">틀린 단어 (${wrongWords.length}개)</div>` +
+      wrongWords.map(w => `<div class="wrong-item"><span class="en">${w.en}</span><span class="ko">${w.ko}</span></div>`).join('')
+    : '';
+
+  // 구글 시트 전송
+  const payload = {
+    name: name,
+    lesson: selectedLesson,
+    score: pct,
+    total: total,
+    correct: correctCount,
+    wrong: wrongWords.map(w => w.en)
+  };
+  fetch('https://script.google.com/macros/s/AKfycbyWioLAUpMNvH6Bc5zgeUHmB5O3ty5LCWthLC6k8xLraV2u8tnQaDHcAJVd2RQ0aDHi/exec', {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(payload)
+  }).catch(() => {});
+}
+
+function retryWrong() {
+  if (!wrongWords.length) return;
+  quizWords = shuffle([...wrongWords]);
+  currentIdx = 0; correctCount = 0; wrongWords = []; answered = false;
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'block';
+  showQuestion();
+}
+
+function goHome() {
+  ['quiz-screen','result-screen'].forEach(id => document.getElementById(id).style.display = 'none');
+  document.getElementById('home-screen').style.display = 'block';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('answer-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { if (!answered) submitAnswer(); else nextQuestion(); }
+  });
+});
+
+init();
+</script>
+</body>
+</html>
